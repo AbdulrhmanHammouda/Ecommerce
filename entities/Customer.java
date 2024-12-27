@@ -1,14 +1,11 @@
-package entities;
-
-import DAO.DAOCustomer;
-
+ package entities;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Customer extends User {
-    
 
-    public void addBalance(double amount) {
+
+    public void addBalance(double amount) throws IllegalArgumentException {
         if (amount < 0) {
             throw new IllegalArgumentException("Amount must be positive.");
         }
@@ -16,14 +13,18 @@ public class Customer extends User {
         System.out.println("Added " + amount + " to balance.");
     }
 
-    public Order checkout() throws Exception {
+    public Order checkout(Order.PaymentMethod paymentMethod) throws Exception {
         if(balance>=cart.calculateTotalPrice()){
-        balance -= cart.calculateTotalPrice();
-        Order o= new Order(this,cart, Order.PaymentMethod.CREDIT_CARD);
-        this.addOrder(o);
-        clearCart(cart);
-        return o;}
-        else throw new Exception("Insuffient balance");
+            balance -= cart.calculateTotalPrice();
+            Order o= new Order(this,cart, paymentMethod);
+            this.addOrder(o);
+            for(Cart.CartItem i: cart.getItems()){
+                i.getProduct().setQuantity(i.getProduct().getQuantity()-i.getQuantity());
+            }
+            cart=new Cart();
+            return o;
+        }
+        else throw new Exception("Insufficient balance");
     }
 
     public enum Gender {
@@ -35,9 +36,8 @@ public class Customer extends User {
     private Gender Gender;
     private List<String> Interests;
     private Cart cart;
-    private static final DAOCustomer daoCustomer = new DAOCustomer();
-    public Customer() {cart= new Cart();}
-    private List<Order> orders = new ArrayList<>();
+
+    private final List<Order> orders = new ArrayList<>();
 
     public List<Order> getOrders() {
         return orders;
@@ -136,52 +136,11 @@ public class Customer extends User {
         System.out.println("Product added to cart: " + product.getName() + " (x" + quantity + ")");
     }
 
-    public void viewCart(Cart cart) {
-        if (cart == null) {
-            throw new IllegalArgumentException("Cart cannot be null.");
-        }
-        System.out.println(cart);
-    }
-
-    public void updateProductQuantity(Cart cart, Product product, int newQuantity) {
-        if (cart == null) {
-            throw new IllegalArgumentException("Cart cannot be null.");
-        }
-        if (product == null || newQuantity <= 0) {
-            throw new IllegalArgumentException("Product cannot be null, and quantity must be positive.");
-        }
-
-        for(Cart.CartItem i:cart.getItems()){
-            if(i.getProduct()==product){
-                i.setQuantity(newQuantity);
-                return;
-            }
-        }
-        throw new IllegalArgumentException("Product not in Cart");
-    }
-
     public void removeProductFromCart(Product product) {
         if (cart == null) {
             throw new IllegalArgumentException("Cart cannot be null.");
         }
         cart.removeCartItem(product);
         System.out.println("Product removed from cart: " + product.getName());
-    }
-
-    public void clearCart(Cart cart) {
-        if (cart == null) {
-            throw new IllegalArgumentException("Cart cannot be null.");
-        }
-
-        cart.getItems().clear();
-        System.out.println("Cart cleared successfully.");
-    }
-
-    public void displayTotalPrice(Cart cart) {
-        if (cart == null) {
-            throw new IllegalArgumentException("Cart cannot be null.");
-        }
-        double totalPrice = cart.calculateTotalPrice();
-        System.out.println("Total Price of cart: $" + totalPrice);
     }
 }
