@@ -17,24 +17,12 @@ public class Product{
     }
     public Product(String name, String description, double price, int quantity, Category category)
             throws InvalidProductException, InvalidCategoryException {
-        if (name == null || name.trim().isEmpty()) {
-            throw new InvalidProductException("Product name cannot be null or empty.");
-        }
-        if (price < 0) {
-            throw new InvalidProductException("Product price cannot be negative.");
-        }
-        if (quantity < 0) {
-            throw new InvalidProductException("Product quantity cannot be negative.");
-        }
-        if (category == null) {
-            throw new InvalidCategoryException("Product must belong to a valid category.");
-        }
         id=generateProductId();
-        this.name = name.trim();
-        this.description = description == null ? "" : description.trim();
-        this.price = price;
-        this.quantity = quantity;
-        this.category = category;
+        setName(name.trim());
+        setDescription(description);
+        setPrice(price);
+        setQuantity(quantity);
+        setCategory(category);
         daoProduct.create(this);
     }
 
