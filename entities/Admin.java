@@ -5,18 +5,17 @@ import DAO.*;
 public class Admin extends User {
     private String role;
     private int workingHours;
-    private final static DAOAdmin daoAdmin = new DAOAdmin();
     private final static DAOOrder daoOrder = new DAOOrder();
     private final static DAOProduct daoProduct = new DAOProduct();
     private final static DAOCategory daoCategory = new DAOCategory();
     // Constructor
     public Admin(String userName, String password, String dateOfBirth, String role, int workingHours) {
         super(userName, password, dateOfBirth);
-        this.role = role;
+        setRole(role);
         setWorkingHours(workingHours);
     }
 
-    // Getter and Setter for role and working hours
+    // Getter and Setter
     public String getRole() {
         return role;
     }
@@ -33,7 +32,12 @@ public class Admin extends User {
         if (workingHours < 0) {
             throw new IllegalArgumentException("Working hours cannot be negative");
         }
-        this.workingHours = workingHours;
+        else if(workingHours>24){
+            throw new IllegalArgumentException("Working hours cannot exceed 24/day");
+        }
+        else {
+            this.workingHours = workingHours;
+        }
     }
 
 
@@ -75,7 +79,7 @@ public class Admin extends User {
     }
 
     public static void updateProduct(Product updatedProduct) {
-       daoProduct.update(updatedProduct);
+        daoProduct.update(updatedProduct);
     }
 
     public static void deleteProduct(Product product) {
@@ -96,23 +100,4 @@ public class Admin extends User {
         return daoOrder.read(order);
     }
 
-    public static void listAllOrders() {
-        if (Database.orders.isEmpty()) {
-            System.out.println("No orders available.");
-            return;
-        }
-        System.out.println("List of all orders:");
-        for (Order order : Database.orders) {
-            System.out.println(order);
-        }
-    }
-
-    public static void deleteOrder(Order order) {
-        daoOrder.delete(order);
-    }
-
-    public static void clearAllOrders() {
-        Database.orders.clear();
-        System.out.println("All orders have been cleared.");
-    }
 }
