@@ -13,7 +13,7 @@ public class Cart {
         return Database.carts.size() + 1;
     }
     public static class CartItem {
-        private Product product;
+        private final Product product;
         private int quantity;
 
         public CartItem(Product product, int quantity) {
@@ -55,6 +55,15 @@ public class Cart {
         if (product == null || quantity <= 0) {
             throw new IllegalArgumentException("Product cannot be null, and quantity must be positive.");
         }
+        else if(product.getQuantity()<quantity){
+            throw new IllegalArgumentException("Quantity of product is greater than the stock");
+        }
+        for (CartItem i:items) {
+            if (i.product == product) {
+                i.quantity += quantity;
+                return;
+            }
+        }
         items.add(new CartItem(product,quantity));
     }
 
@@ -94,7 +103,6 @@ public class Cart {
         return cartDetails.toString();
     }
 
-    // Getters for external use
     public List<CartItem> getItems() {
         return new ArrayList<>(items);
     }
